@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "jest": "^26.6.3",
+    "jsdom": "^16.4.0"
+  },
+  "name": "find-stacking-contexts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest --coverage",
+    "format": "prettier src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
