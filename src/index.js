@@ -58,6 +58,27 @@ function createsStackingContext(el, window) {
     return true;
   }
 
+  if (style["will-change"]) {
+    const values = style["will-change"].split(/,\s?/);
+    const stackingContextRelatedProperties = new Set([
+      "z-index",
+      "position",
+      "mix-blend-mode",
+      "-webkit-overflow-scrolling",
+      "transform",
+      "filter",
+      "perspective",
+      "clip-path",
+      "mask",
+      "mask-image",
+      "mask-border",
+    ]);
+
+    if (values.some((value) => stackingContextRelatedProperties.has(value))) {
+      return true;
+    }
+  }
+
   return false;
 }
 function findStackingContexts(targetEl, inputWindow) {

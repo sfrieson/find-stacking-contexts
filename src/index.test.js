@@ -309,7 +309,7 @@ describe("findStackingContexts", () => {
             </div>
           `);
           const propertyWithRandomValue = new JSDOM(`
-            <div id="target" style="${property}: 5;">
+            <div id="target" style="${property}: random-value;">
               <div id="test-el"></div>
             </div>
           `);
@@ -402,9 +402,43 @@ describe("findStackingContexts", () => {
       });
     });
 
-    it.todo(
-      "Element with a will-change value specifying any property that would create a stacking context on non-initial value"
-    );
+    it("Element with a will-change value specifying any property that would create a stacking context on non-initial value", () => {
+      const nonStackingValue = new JSDOM(`
+          <div style="will-change: display">
+            <div id="test-el"></div>
+          </div>
+        `);
+
+      const stackingValue = new JSDOM(`
+          <div id="target" style="will-change: position">
+            <div id="test-el"></div>
+          </div>
+        `);
+
+      const stackingValueInList = new JSDOM(`
+          <div id="target" style="will-change: font, position">
+            <div id="test-el"></div>
+          </div>
+        `);
+
+      const expectNoContexts = [nonStackingValue];
+      const expectContexts = [stackingValue, stackingValueInList];
+
+      expectNoContexts.forEach((dom) => {
+        const testEl = dom.window.document.getElementById("test-el");
+        const contexts = findStackingContexts(testEl, dom.window);
+
+        expect(contexts).toHaveLength(1);
+      });
+
+      expectContexts.forEach((dom) => {
+        const testEl = dom.window.document.getElementById("test-el");
+        const contexts = findStackingContexts(testEl, dom.window);
+
+        expect(contexts).toHaveLength(2);
+        expect(contexts[0]).toHaveProperty("id", "target");
+      });
+    });
     it.todo(
       "Element with a contain value of layout, or paint, or a composite value that includes either of them"
     );
