@@ -58,13 +58,14 @@ function createsStackingContext(el, window) {
     return true;
   }
 
-  if (style["will-change"]) {
+  if (style["will-change"] && style["will-change"] !== "auto") {
     const values = style["will-change"].split(/,\s?/);
     const stackingContextRelatedProperties = new Set([
       "z-index",
       "position",
       "mix-blend-mode",
       "-webkit-overflow-scrolling",
+      "contain",
       "transform",
       "filter",
       "perspective",
@@ -75,6 +76,20 @@ function createsStackingContext(el, window) {
     ]);
 
     if (values.some((value) => stackingContextRelatedProperties.has(value))) {
+      return true;
+    }
+  }
+
+  if (style.contain && style.contain !== "auto") {
+    const values = style.contain.split(" ");
+    const stackingContextValues = new Set([
+      "layout",
+      "paint",
+      "strict",
+      "content",
+    ]);
+
+    if (values.some((value) => stackingContextValues.has(value))) {
       return true;
     }
   }

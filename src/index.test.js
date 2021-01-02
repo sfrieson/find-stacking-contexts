@@ -416,7 +416,7 @@ describe("findStackingContexts", () => {
         `);
 
       const stackingValueInList = new JSDOM(`
-          <div id="target" style="will-change: font, position">
+          <div id="target" style="will-change: font, position;">
             <div id="test-el"></div>
           </div>
         `);
@@ -439,9 +439,68 @@ describe("findStackingContexts", () => {
         expect(contexts[0]).toHaveProperty("id", "target");
       });
     });
-    it.todo(
-      "Element with a contain value of layout, or paint, or a composite value that includes either of them"
-    );
+
+    it("Element with a contain value of layout, or paint, or a composite value that includes either of them.", () => {
+      const noContainValue = new JSDOM(`
+        <div style="contain: size">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const containLayout = new JSDOM(`
+        <div id="target" style="contain: layout;">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const containPaint = new JSDOM(`
+        <div id="target" style="contain: paint;">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const containSizeLayoutPaint = new JSDOM(`
+        <div id="target" style="contain: size layout paint;">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const containStrict = new JSDOM(`
+        <div id="target" style="contain: strict;">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const containContent = new JSDOM(`
+        <div id="target" style="contain: content;">
+          <div id="test-el"></div>
+        </div>
+      `);
+
+      const expectNoContexts = [noContainValue];
+      const expectContexts = [
+        containLayout,
+        containPaint,
+        containSizeLayoutPaint,
+        containStrict,
+        containContent,
+      ];
+
+      expectNoContexts.forEach((dom) => {
+        const testEl = dom.window.document.getElementById("test-el");
+        const contexts = findStackingContexts(testEl, dom.window);
+
+        expect(contexts).toHaveLength(1);
+      });
+
+      expectContexts.forEach((dom) => {
+        const testEl = dom.window.document.getElementById("test-el");
+        const contexts = findStackingContexts(testEl, dom.window);
+
+        expect(contexts).toHaveLength(2);
+        expect(contexts[0]).toHaveProperty("id", "target");
+      });
+    });
   });
 
   it("properly skips over invalid contexts", () => {
